@@ -1,10 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
 	mapf, reducef := loadPlugin()
-	fmt.Printf("Map function return value: %v", mapf)
+	fmt.Printf("Map function return value: %v\n", mapf)
 	fmt.Printf("Reduce function return value: %v", reducef)
 
 }
