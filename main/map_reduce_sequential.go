@@ -2,37 +2,47 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
-	"os"
+	"plugin"
 )
 
+// this is a duplicate struct, figure out how to use just a single one
+type KeyValue struct {
+	Key   string
+	Value string
+}
+
+
 func main() {
-	mapf, reducef := loadPlugin()
+	mapf := loadPlugin()
 	fmt.Printf("Map function return value: %v\n", mapf)
-	fmt.Printf("Reduce function return value: %v", reducef)
+	// fmt.Printf("Reduce function return value: %v", reducef)
 
 }
 
-func loadPlugin() (int, int) {
+func loadPlugin() (func(string, string) []KeyValue) {
 	/*
 		Input data will be read here;
 		The data will be passed into the Map function
 		The intermidiate data produced from Map will be accumulated and returned
 	*/
+	fileName :=  "map_reduce/map.go" // pass this as an argument
 
-	for _, fileName := range os.Args[1:] {
-		file, err := os.Open(fileName)
+	file, err := plugin.Open(fileName) // to access this, it needs to be built as plugin: go build -buildmode=plugin + path name
 
-		content, err := io.ReadAll(file)
-
-		if err != nil {
-			log.Fatalf("cannot read %v", fileName)
-		}
-		file.Close()
-
-		// pass the file name and the content to the Map
-		fmt.Println(content)
+	if err != nil {
+		log.Fatalf("Cannot open plugin %v", fileName)
 	}
-	return 0, 0
+
+	mapFuncImported, err := file.Lookup("Map")
+	if err != nil {
+		log.Fatalf("Cannot find map in file %v", fileName)
+	}
+
+	mapFunc := mapFuncImported.(func(string, string)[]KeyValue)
+
+	fmt.Printf("map func %v", mapFunc)
+
+	return mapFunc
+
 }
