@@ -6,13 +6,10 @@ import (
 	"log"
 	"os"
 	"plugin"
-)
+	"reflect"
 
-// this is a duplicate struct, figure out how to use just a single one
-type KeyValue struct {
-	Key   string
-	Value string
-}
+	"example.com/models"
+)
 
 func main() {
 	fmt.Println(os.Args[1])
@@ -40,7 +37,7 @@ func main() {
 
 }
 
-func loadPlugin(fileName string) func(string, string) []KeyValue {
+func loadPlugin(fileName string) func(string, string) []models.KeyValue {
 	/*
 		Input data will be read here;
 		The data will be passed into the Map function
@@ -60,11 +57,14 @@ func loadPlugin(fileName string) func(string, string) []KeyValue {
 
 	fmt.Println("there")
 
-	// type is fuqed
-	mapFunc, ok := mapFuncImported.(func(string, string) []KeyValue)
+	// go run main.go ../mapreduce.so ../mapreduce/lotr-script.txt
+	// type of imported func is wrong: func(string, string) []main.KeyValue
+	mapFunc, ok := mapFuncImported.(func(string, string) []models.KeyValue)
 	fmt.Println("but not here")
 	fmt.Printf("hubabuba %v", ok)
 	if !ok {
+		log.Println(reflect.TypeOf(mapFuncImported))
+
 		log.Fatalf("Invalid type for map function in file %v", fileName)
 	}
 

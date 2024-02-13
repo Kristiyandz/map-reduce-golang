@@ -1,4 +1,4 @@
-module example.com/main
+module example.com/mapreduce
 
 go 1.21.5
 

@@ -1,24 +1,21 @@
-package main
+package mapreduce
 
 import (
 	"strings"
 	"unicode"
+
+	"example.com/models"
 )
 
-type KeyValue struct {
-	Key   string
-	Value string
-}
-
-func Map(fileName string, contents string) []KeyValue {
+func Map(fileName string, contents string) []models.KeyValue {
 	ff := func(r rune) bool { return !unicode.IsLetter(r) }
 
 	words := strings.FieldsFunc(contents, ff)
 
-	keyValueSlice := []KeyValue{}
+	keyValueSlice := []models.KeyValue{}
 
 	for _, w := range words {
-		kv := KeyValue{w, "1"}
+		kv := models.KeyValue{Key: w, Value: "1"}
 		keyValueSlice = append(keyValueSlice, kv)
 	}
 	return keyValueSlice
